@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+spec:
+  selector:
+    matchLabels:
+      run: webapp
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        run: webapp
+    spec:
+      containers:
+      - name: webapp
+        image: adj-webapp
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: app-port
+          containerPort: 80
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - curl -s http://localhost:80/healthcheck | grep -c "OK"
+          failureThreshold: 1
+          periodSeconds: 10
+          initialDelaySeconds: 3
+        startupProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - curl -s http://localhost:80/healthcheck | grep -c "OK"
+          failureThreshold: 30
+          periodSeconds: 10
+
+
+
+
